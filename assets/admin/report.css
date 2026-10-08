@@ -1,0 +1,1311 @@
+/*
+ * Zhayon Funnel — report page. Everything is scoped under .zhf so the
+ * WordPress admin chrome is untouched. Brand variables (--zhf-primary…)
+ * are printed inline from the settings.
+ */
+
+@font-face {
+	font-family: "Vazirmatn";
+	src: url("fonts/Vazirmatn-wght.woff2") format("woff2-variations"),
+		url("fonts/Vazirmatn-wght.woff2") format("woff2");
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+}
+
+.zhf {
+	--zhf-primary: #0166ff;
+	--zhf-primary-hover: #015eeb;
+	--zhf-primary-tint: #e8f1ff;
+	--zhf-primary-tint-border: #ccdfff;
+	--zhf-primary-ring: rgba(1, 102, 255, .35);
+
+	--zhf-page: #fafafa;
+	--zhf-card: #ffffff;
+	--zhf-border: #eaeaea;
+	--zhf-border-hover: #d4d4d4;
+	--zhf-text: #171717;
+	--zhf-text-2: #666666;
+	--zhf-muted: #8f8f8f;
+	--zhf-subtle: #f5f5f5;
+	--zhf-bar: #a1a1a1;
+	--zhf-success: #16a34a;
+	--zhf-danger: #dc2626;
+
+	--zhf-font: IRANYekanX, Vazirmatn, Tahoma, sans-serif;
+	--zhf-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+	--zhf-radius-card: 14px;
+	--zhf-radius: 10px;
+	--zhf-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+	--zhf-gap: 24px;
+
+	box-sizing: border-box;
+	max-width: none;
+	margin: 0;
+	margin-inline-start: -20px;
+	padding: 28px 32px 64px;
+	min-height: calc(100vh - 32px);
+	background: var(--zhf-page);
+	color: var(--zhf-text);
+	font-family: var(--zhf-font);
+	font-size: 14px;
+	line-height: 1.7;
+	direction: rtl;
+	text-align: right;
+}
+
+.zhf > * {
+	max-width: 1200px;
+	margin-inline-start: auto;
+	margin-inline-end: auto;
+}
+
+.zhf *,
+.zhf *::before,
+.zhf *::after {
+	box-sizing: border-box;
+}
+
+/*
+ * Admin font plugins (e.g. Persian WooCommerce) set their font on every
+ * div/span/td/… and on h1–h6 with !important; keep ours inside .zhf only.
+ */
+.zhf * {
+	font-family: var(--zhf-font);
+}
+
+.zhf h1,
+.zhf h2,
+.zhf h3 {
+	font-family: var(--zhf-font) !important;
+}
+
+.zhf code,
+.zhf code *,
+.zhf pre,
+.zhf .zhf-input-hex {
+	font-family: var(--zhf-mono);
+}
+
+.zhf a {
+	color: var(--zhf-primary);
+	text-decoration: none;
+}
+
+.zhf a:hover {
+	color: var(--zhf-primary-hover);
+}
+
+.zhf :focus-visible {
+	outline: 2px solid var(--zhf-primary);
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+.zhf code,
+.zhf .zhf-code {
+	direction: ltr;
+	unicode-bidi: isolate;
+	display: inline-block;
+	padding: 0 6px;
+	margin: 0;
+	border-radius: 6px;
+	background: var(--zhf-subtle);
+	color: var(--zhf-text-2);
+	font-size: 11px;
+	line-height: 20px;
+}
+
+.zhf .zhf-muted {
+	color: var(--zhf-muted);
+	font-size: 12px;
+}
+
+.zhf .num,
+.zhf .zhf-kpi-value,
+.zhf .zhf-step-nums,
+.zhf .zhf-pill,
+.zhf .zhf-tooltip {
+	font-variant-numeric: tabular-nums;
+	font-feature-settings: "tnum" 1;
+}
+
+/* ------------------------------------------------------------------ Head */
+
+.zhf-head {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 20px;
+}
+
+.zhf-head-text {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.zhf .zhf-title {
+	margin: 0;
+	padding: 0;
+	font-family: inherit;
+	font-size: 24px;
+	line-height: 1.4;
+	font-weight: 600;
+	color: var(--zhf-text);
+}
+
+.zhf .zhf-sub {
+	margin: 4px 0 0;
+	font-size: 14px;
+	color: var(--zhf-text-2);
+}
+
+.zhf-badge {
+	display: inline-flex;
+	align-items: center;
+	height: 28px;
+	padding: 0 12px;
+	border-radius: 999px;
+	border: 1px solid var(--zhf-border);
+	background: var(--zhf-card);
+	font-size: 12px;
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+.zhf-badge::before {
+	content: "";
+	width: 6px;
+	height: 6px;
+	margin-inline-end: 8px;
+	border-radius: 50%;
+	background: currentColor;
+}
+
+.zhf-badge-warn {
+	color: #b45309;
+	border-color: #fde68a;
+	background: #fffbeb;
+}
+
+.zhf-badge-muted {
+	color: var(--zhf-text-2);
+}
+
+/* ------------------------------------------------------------------ Tabs */
+
+.zhf-tabs {
+	display: flex;
+	gap: 4px;
+	border-bottom: 1px solid var(--zhf-border);
+	margin-bottom: 24px;
+}
+
+.zhf .zhf-tab {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	height: 40px;
+	padding: 0 12px;
+	color: var(--zhf-text-2);
+	font-size: 14px;
+	font-weight: 500;
+	border-radius: var(--zhf-radius) var(--zhf-radius) 0 0;
+}
+
+.zhf .zhf-tab:hover {
+	color: var(--zhf-text);
+}
+
+.zhf .zhf-tab.is-active {
+	color: var(--zhf-text);
+}
+
+.zhf .zhf-tab.is-active::after {
+	content: "";
+	position: absolute;
+	inset-inline: 8px;
+	bottom: -1px;
+	height: 2px;
+	border-radius: 2px;
+	background: var(--zhf-text);
+}
+
+.zhf hr.wp-header-end {
+	margin: 0;
+	border: 0;
+}
+
+/* --------------------------------------------------------- Form controls */
+
+.zhf-btn,
+.zhf .button.zhf-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	height: 40px;
+	min-height: 40px;
+	padding: 0 16px;
+	margin: 0;
+	border: 1px solid transparent;
+	border-radius: var(--zhf-radius);
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1;
+	white-space: nowrap;
+	cursor: pointer;
+	text-decoration: none;
+	transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.zhf .zhf-btn-primary {
+	background: var(--zhf-primary);
+	border-color: var(--zhf-primary);
+	color: #fff;
+}
+
+.zhf .zhf-btn-primary:hover {
+	background: var(--zhf-primary-hover);
+	border-color: var(--zhf-primary-hover);
+	color: #fff;
+}
+
+.zhf .zhf-btn-secondary {
+	background: var(--zhf-card);
+	border-color: var(--zhf-border);
+	color: var(--zhf-text);
+}
+
+.zhf .zhf-btn-secondary:hover {
+	border-color: var(--zhf-border-hover);
+	background: var(--zhf-page);
+	color: var(--zhf-text);
+}
+
+.zhf .zhf-btn-ghost {
+	background: transparent;
+	color: var(--zhf-text-2);
+}
+
+.zhf .zhf-btn-ghost:hover {
+	background: var(--zhf-subtle);
+	color: var(--zhf-text);
+}
+
+.zhf .zhf-btn:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 2px var(--zhf-card), 0 0 0 4px var(--zhf-primary);
+}
+
+.zhf .zhf-input,
+.zhf .zhf-select {
+	height: 40px;
+	min-height: 40px;
+	margin: 0;
+	padding: 0 12px;
+	border: 1px solid var(--zhf-border);
+	border-radius: var(--zhf-radius);
+	background-color: var(--zhf-card);
+	color: var(--zhf-text);
+	font-family: inherit;
+	font-size: 14px;
+	line-height: 38px;
+	box-shadow: none;
+	transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.zhf .zhf-select {
+	padding-inline-start: 12px;
+	padding-inline-end: 32px;
+	background-position: left 12px top 55%;
+	min-width: 150px;
+}
+
+.zhf .zhf-input:hover,
+.zhf .zhf-select:hover {
+	border-color: var(--zhf-border-hover);
+	color: var(--zhf-text);
+}
+
+.zhf .zhf-input:focus,
+.zhf .zhf-select:focus {
+	border-color: var(--zhf-primary);
+	box-shadow: 0 0 0 2px var(--zhf-primary-ring);
+	outline: none;
+}
+
+.zhf .zhf-input:disabled {
+	background: var(--zhf-subtle);
+	color: var(--zhf-muted);
+}
+
+.zhf .zhf-input:invalid:not(:focus):not(:placeholder-shown) {
+	border-color: var(--zhf-danger);
+}
+
+.zhf .zhf-input-date {
+	width: 128px;
+	text-align: center;
+	direction: ltr;
+}
+
+.zhf .zhf-input-num {
+	width: 96px;
+	text-align: left;
+	-moz-appearance: textfield;
+}
+
+.zhf-field-inline {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--zhf-text-2);
+	font-size: 13px;
+}
+
+/* Native checkbox, tinted (WordPress draws its own; turn that off here). */
+.zhf input[type="checkbox"]:not(.zhf-switch) {
+	-webkit-appearance: checkbox;
+	appearance: auto;
+	width: 16px;
+	height: 16px;
+	min-width: 16px;
+	margin: 0;
+	border: 0;
+	box-shadow: none;
+	accent-color: var(--zhf-primary);
+}
+
+.zhf input[type="checkbox"]:not(.zhf-switch)::before,
+.zhf input[type="checkbox"]:not(.zhf-switch):checked::before {
+	content: none;
+}
+
+.zhf-check {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 40px;
+	color: var(--zhf-text-2);
+	font-size: 13px;
+	cursor: pointer;
+	user-select: none;
+}
+
+/* Toggle switch. */
+.zhf .zhf-switch {
+	-webkit-appearance: none;
+	appearance: none;
+	position: relative;
+	flex: 0 0 auto;
+	width: 40px;
+	height: 24px;
+	min-width: 40px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 999px;
+	background: #d4d4d4;
+	box-shadow: none;
+	cursor: pointer;
+	transition: background-color .15s ease;
+}
+
+.zhf .zhf-switch::before {
+	content: "";
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	width: 18px;
+	height: 18px;
+	margin: 0;
+	border-radius: 50%;
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .15);
+	transition: transform .15s ease;
+}
+
+.zhf .zhf-switch:checked {
+	background: var(--zhf-primary);
+}
+
+.zhf .zhf-switch:checked::before {
+	content: "";
+	transform: translateX(-16px);
+}
+
+.zhf .zhf-switch:focus,
+.zhf .zhf-switch:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 2px var(--zhf-card), 0 0 0 4px var(--zhf-primary);
+}
+
+/* Segmented control. */
+.zhf-seg {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	height: 40px;
+	padding: 3px;
+	border: 1px solid var(--zhf-border);
+	border-radius: var(--zhf-radius);
+	background: var(--zhf-card);
+}
+
+.zhf .zhf-seg-item {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 32px;
+	min-width: 56px;
+	padding: 0 12px;
+	border: 0;
+	border-radius: 7px;
+	background: transparent;
+	color: var(--zhf-text-2);
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: 500;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.zhf .zhf-seg-item:hover {
+	color: var(--zhf-text);
+	background: var(--zhf-subtle);
+}
+
+.zhf .zhf-seg-item.is-active {
+	color: var(--zhf-primary);
+	background: var(--zhf-primary-tint);
+	box-shadow: inset 0 0 0 1px var(--zhf-primary-tint-border);
+}
+
+.zhf .zhf-seg-item:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 2px var(--zhf-primary);
+}
+
+/* ---------------------------------------------------------------- Filters */
+
+.zhf-filters {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.zhf-custom {
+	display: inline-flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.zhf-custom[hidden] {
+	display: none;
+}
+
+.zhf .zhf-filters-end {
+	margin-inline-start: auto;
+}
+
+.zhf .zhf-meta {
+	margin: 0 0 var(--zhf-gap);
+	color: var(--zhf-muted);
+	font-size: 12px;
+}
+
+/* ------------------------------------------------------------------ Cards */
+
+.zhf-card {
+	background: var(--zhf-card);
+	border: 1px solid var(--zhf-border);
+	border-radius: var(--zhf-radius-card);
+	box-shadow: var(--zhf-shadow);
+	padding: 20px 24px;
+	margin-bottom: var(--zhf-gap);
+	min-width: 0;
+}
+
+.zhf-card-quiet {
+	background: transparent;
+	box-shadow: none;
+}
+
+.zhf-card-head {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 4px 12px;
+	margin-bottom: 12px;
+}
+
+.zhf .zhf-card-title {
+	margin: 0;
+	padding: 0;
+	font-family: inherit;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.6;
+	color: var(--zhf-text);
+}
+
+.zhf-card-foot {
+	margin-top: 16px;
+}
+
+.zhf-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--zhf-gap);
+	align-items: start;
+}
+
+.zhf-grid > .zhf-card {
+	margin-bottom: 0;
+}
+
+.zhf-note {
+	margin: 16px 0 0;
+	padding-top: 12px;
+	border-top: 1px solid var(--zhf-border);
+	color: var(--zhf-text-2);
+	font-size: 12px;
+	line-height: 1.9;
+}
+
+/* -------------------------------------------------------------------- KPI */
+
+.zhf-kpis {
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	gap: var(--zhf-gap);
+	margin-bottom: var(--zhf-gap);
+}
+
+.zhf-kpis > .zhf-kpi {
+	margin-bottom: 0;
+	padding: 16px 20px;
+}
+
+.zhf-kpi-label {
+	color: var(--zhf-muted);
+	font-size: 12px;
+	line-height: 1.6;
+}
+
+.zhf-kpi-value {
+	margin-top: 4px;
+	font-size: 28px;
+	font-weight: 600;
+	line-height: 1.3;
+	letter-spacing: -.01em;
+}
+
+.zhf-kpi-foot {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.zhf-pill {
+	display: inline-flex;
+	align-items: center;
+	height: 22px;
+	padding: 0 8px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1;
+	white-space: nowrap;
+}
+
+.zhf-pill.is-up {
+	color: var(--zhf-success);
+	background: rgba(22, 163, 74, .1);
+}
+
+.zhf-pill.is-down {
+	color: var(--zhf-danger);
+	background: rgba(220, 38, 38, .1);
+}
+
+.zhf-pill.is-flat {
+	color: var(--zhf-text-2);
+	background: var(--zhf-subtle);
+}
+
+/* ----------------------------------------------------------------- Funnel */
+
+.zhf-funnel {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.zhf-step {
+	display: grid;
+	grid-template-columns: minmax(150px, 220px) minmax(0, 1fr) 220px;
+	align-items: center;
+	gap: 16px;
+	min-height: 44px;
+	margin: 0;
+	padding: 6px 0;
+	border-bottom: 1px solid var(--zhf-border);
+}
+
+.zhf-step:last-child {
+	border-bottom: 0;
+}
+
+.zhf-step-label {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+	min-width: 0;
+	font-weight: 500;
+}
+
+.zhf-step.is-guest .zhf-step-label {
+	padding-inline-start: 16px;
+	color: var(--zhf-text-2);
+	font-weight: 400;
+}
+
+.zhf-step.is-guest .zhf-step-label::before {
+	content: "";
+	width: 8px;
+	height: 1px;
+	margin-inline-start: -16px;
+	margin-inline-end: 4px;
+	background: var(--zhf-border-hover);
+}
+
+.zhf-tag {
+	display: inline-flex;
+	align-items: center;
+	height: 20px;
+	padding: 0 8px;
+	border-radius: 999px;
+	background: var(--zhf-subtle);
+	color: var(--zhf-text-2);
+	font-size: 11px;
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+.zhf-tag-primary {
+	background: var(--zhf-primary-tint);
+	color: var(--zhf-primary);
+}
+
+.zhf-step-bar {
+	position: relative;
+	height: 20px;
+	border-radius: 4px;
+	background: var(--zhf-subtle);
+	cursor: default;
+}
+
+.zhf-step-bar > span {
+	display: block;
+	height: 100%;
+	min-width: 2px;
+	border-start-start-radius: 0;
+	border-end-start-radius: 0;
+	border-start-end-radius: 4px;
+	border-end-end-radius: 4px;
+	background: var(--zhf-bar);
+	transition: filter .15s ease;
+}
+
+.zhf-step-bar > span.is-zero {
+	min-width: 0;
+}
+
+.zhf-step-bar:hover > span,
+.zhf-step-bar:focus-visible > span {
+	filter: brightness(.92);
+}
+
+.zhf-step.is-guest .zhf-step-bar > span {
+	background: #c4c4c4;
+}
+
+.zhf-step.is-worst .zhf-step-bar > span {
+	background: var(--zhf-primary);
+}
+
+.zhf-step-nums {
+	display: grid;
+	grid-template-columns: 1fr 64px 64px;
+	align-items: baseline;
+	gap: 8px;
+	text-align: left;
+	direction: rtl;
+}
+
+.zhf-step-nums strong {
+	font-size: 15px;
+	font-weight: 600;
+	text-align: left;
+}
+
+.zhf-step-nums .zhf-muted {
+	text-align: left;
+}
+
+.zhf-drop {
+	color: var(--zhf-text-2);
+	font-size: 12px;
+	text-align: left;
+}
+
+.zhf-step.is-worst .zhf-drop {
+	color: var(--zhf-primary);
+	font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ Trend */
+
+.zhf-trend {
+	position: relative;
+}
+
+.zhf-trend-panel + .zhf-trend-panel {
+	margin-top: 8px;
+}
+
+.zhf-trend-title {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--zhf-text-2);
+	font-size: 12px;
+}
+
+.zhf-key {
+	display: inline-block;
+	width: 14px;
+	height: 2px;
+	border-radius: 2px;
+	background: var(--zhf-text);
+}
+
+.zhf-key.is-primary {
+	background: var(--zhf-primary);
+}
+
+/* Geometry is computed in LTR coordinates (time is mirrored in JS), so
+   text-anchor start/end keep their plain meaning. */
+.zhf-trend svg {
+	direction: ltr;
+	display: block;
+	width: 100%;
+	height: 132px;
+	overflow: visible;
+	font-family: inherit;
+}
+
+.zhf-trend .zhf-grid-line {
+	stroke: var(--zhf-border);
+	stroke-width: 1;
+	shape-rendering: crispEdges;
+}
+
+.zhf-trend .zhf-axis-text {
+	fill: var(--zhf-muted);
+	font-size: 11px;
+}
+
+.zhf-trend .zhf-line {
+	fill: none;
+	stroke: var(--zhf-text);
+	stroke-width: 2;
+	stroke-linejoin: round;
+	stroke-linecap: round;
+}
+
+.zhf-trend [data-series="cart"] .zhf-line {
+	stroke: var(--zhf-primary);
+}
+
+.zhf-trend .zhf-area {
+	fill: var(--zhf-text);
+	opacity: .04;
+}
+
+.zhf-trend [data-series="cart"] .zhf-area {
+	fill: var(--zhf-primary);
+	opacity: .07;
+}
+
+.zhf-trend .zhf-cross {
+	stroke: var(--zhf-border-hover);
+	stroke-width: 1;
+	shape-rendering: crispEdges;
+}
+
+.zhf-trend .zhf-dot {
+	fill: var(--zhf-text);
+	stroke: var(--zhf-card);
+	stroke-width: 2;
+}
+
+.zhf-trend [data-series="cart"] .zhf-dot {
+	fill: var(--zhf-primary);
+}
+
+.zhf-trend .zhf-hit {
+	fill: transparent;
+	cursor: crosshair;
+}
+
+.zhf-tooltip {
+	position: absolute;
+	z-index: 5;
+	min-width: 160px;
+	padding: 10px 12px;
+	border: 1px solid var(--zhf-border);
+	border-radius: var(--zhf-radius);
+	background: var(--zhf-card);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, .08);
+	color: var(--zhf-text);
+	font-size: 12px;
+	line-height: 1.8;
+	pointer-events: none;
+}
+
+.zhf-tooltip[hidden] {
+	display: none;
+}
+
+.zhf-tooltip-date {
+	color: var(--zhf-muted);
+	margin-bottom: 2px;
+}
+
+.zhf-tooltip-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.zhf-tooltip-row strong {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.zhf-tooltip-row span {
+	color: var(--zhf-text-2);
+}
+
+/* Floating tooltip for funnel bars. */
+.zhf-tip-float {
+	position: fixed;
+	max-width: 280px;
+}
+
+.zhf-details {
+	margin-top: 12px;
+	border-top: 1px solid var(--zhf-border);
+	padding-top: 12px;
+}
+
+.zhf-details summary {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: var(--zhf-primary);
+	font-size: 13px;
+	cursor: pointer;
+	list-style: none;
+}
+
+.zhf-details summary::-webkit-details-marker {
+	display: none;
+}
+
+.zhf-details summary::before {
+	content: "";
+	width: 6px;
+	height: 6px;
+	border-inline-start: 1.5px solid currentColor;
+	border-bottom: 1.5px solid currentColor;
+	transform: rotate(-45deg);
+	transition: transform .15s ease;
+}
+
+.zhf-details[open] summary::before {
+	transform: rotate(-135deg);
+}
+
+.zhf-details .zhf-table-wrap {
+	max-height: 360px;
+	overflow-y: auto;
+	margin-top: 8px;
+}
+
+/* ------------------------------------------------------------------ Table */
+
+.zhf-table-wrap {
+	overflow-x: auto;
+	margin-inline: -4px;
+	padding-inline: 4px;
+}
+
+.zhf .zhf-table {
+	width: 100%;
+	border-collapse: collapse;
+	border-spacing: 0;
+	background: transparent;
+	border: 0;
+	font-size: 14px;
+}
+
+.zhf .zhf-table th {
+	height: 36px;
+	padding: 0 12px;
+	border-bottom: 1px solid var(--zhf-border);
+	color: var(--zhf-muted);
+	font-size: 12px;
+	font-weight: 500;
+	text-align: right;
+	white-space: nowrap;
+	vertical-align: middle;
+}
+
+.zhf .zhf-table td {
+	height: 44px;
+	padding: 6px 12px;
+	border-bottom: 1px solid var(--zhf-border);
+	color: var(--zhf-text);
+	text-align: right;
+	vertical-align: middle;
+}
+
+.zhf .zhf-table th:first-child,
+.zhf .zhf-table td:first-child {
+	padding-inline-start: 0;
+}
+
+.zhf .zhf-table th:last-child,
+.zhf .zhf-table td:last-child {
+	padding-inline-end: 0;
+}
+
+.zhf .zhf-table tbody tr:last-child td {
+	border-bottom: 0;
+}
+
+.zhf .zhf-table .num {
+	text-align: left;
+	white-space: nowrap;
+}
+
+.zhf .zhf-table td .zhf-code {
+	margin-inline-start: 6px;
+}
+
+.zhf-empty-inline {
+	margin: 0;
+	padding: 12px 0 4px;
+	color: var(--zhf-muted);
+	font-size: 13px;
+}
+
+/* ------------------------------------------------------------ Empty state */
+
+.zhf-empty {
+	padding: 48px 24px;
+	text-align: center;
+}
+
+.zhf .zhf-empty-title {
+	margin: 0 0 8px;
+	font-family: inherit;
+	font-size: 17px;
+	font-weight: 600;
+	color: var(--zhf-text);
+}
+
+.zhf-empty p {
+	max-width: 560px;
+	margin: 0 auto 20px;
+	color: var(--zhf-text-2);
+}
+
+/* --------------------------------------------------------------- Settings */
+
+.zhf-settings > .zhf-card {
+	padding-bottom: 8px;
+}
+
+.zhf-row {
+	display: flex;
+	align-items: center;
+	gap: 24px;
+	padding: 16px 0;
+	border-top: 1px solid var(--zhf-border);
+}
+
+.zhf-card-head + .zhf-row {
+	border-top: 0;
+	padding-top: 4px;
+}
+
+.zhf-row-text {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.zhf .zhf-row-title {
+	display: block;
+	font-weight: 500;
+	color: var(--zhf-text);
+	cursor: pointer;
+}
+
+.zhf .zhf-help {
+	margin: 2px 0 0;
+	color: var(--zhf-text-2);
+	font-size: 13px;
+	line-height: 1.8;
+}
+
+.zhf .zhf-help-block {
+	margin: 0 0 12px;
+}
+
+.zhf-input-group {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--zhf-text-2);
+}
+
+.zhf-color {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.zhf .zhf-color-swatch {
+	width: 40px;
+	height: 40px;
+	padding: 3px;
+	border: 1px solid var(--zhf-border);
+	border-radius: var(--zhf-radius);
+	background: var(--zhf-card);
+	cursor: pointer;
+}
+
+.zhf .zhf-color-swatch::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+
+.zhf .zhf-color-swatch::-webkit-color-swatch {
+	border: 0;
+	border-radius: 7px;
+}
+
+.zhf .zhf-color-swatch::-moz-color-swatch {
+	border: 0;
+	border-radius: 7px;
+}
+
+.zhf .zhf-input-hex {
+	width: 110px;
+	text-align: left;
+}
+
+.zhf .zhf-sources .zhf-input {
+	width: 100%;
+}
+
+.zhf .zhf-sources td {
+	padding-block: 6px;
+}
+
+.zhf .zhf-col-action {
+	width: 1%;
+	text-align: left;
+}
+
+.zhf-actions {
+	display: flex;
+	justify-content: flex-start;
+	margin-bottom: var(--zhf-gap);
+}
+
+.zhf .zhf-pre {
+	margin: 0;
+	padding: 12px 16px;
+	border: 1px solid var(--zhf-border);
+	border-radius: var(--zhf-radius);
+	background: var(--zhf-card);
+	overflow-x: auto;
+	text-align: left;
+}
+
+.zhf .zhf-pre code {
+	display: block;
+	padding: 0;
+	background: transparent;
+	color: var(--zhf-text);
+	font-size: 12px;
+	line-height: 1.8;
+	white-space: pre;
+}
+
+/* In-page alerts (settings saved / validation). WordPress notices are hidden on this page. */
+.zhf-alerts {
+	display: grid;
+	gap: 8px;
+	margin-bottom: var(--zhf-gap);
+}
+
+.zhf-alert {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-height: 44px;
+	padding: 10px 16px;
+	border: 1px solid var(--zhf-border);
+	border-radius: var(--zhf-radius);
+	background: var(--zhf-card);
+	color: var(--zhf-text);
+	font-size: 14px;
+	line-height: 1.7;
+}
+
+.zhf-alert::before {
+	content: "";
+	flex: 0 0 auto;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--zhf-primary);
+}
+
+.zhf-alert-success {
+	border-color: var(--zhf-primary-tint-border);
+	background: var(--zhf-primary-tint);
+}
+
+.zhf-alert-error {
+	border-color: #fecaca;
+	background: #fef2f2;
+	color: #991b1b;
+}
+
+.zhf-alert-error::before {
+	background: var(--zhf-danger);
+}
+
+.zhf-alert-warning {
+	border-color: #fde68a;
+	background: #fffbeb;
+	color: #92400e;
+}
+
+.zhf-alert-warning::before {
+	background: #d97706;
+}
+
+/* ------------------------------------------------------------- Responsive */
+
+@media (max-width: 1100px) {
+	.zhf-kpis {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	/* An odd card out (conversion) takes the full row. */
+	.zhf-kpis > .zhf-kpi:last-child:nth-child(odd) {
+		grid-column: 1 / -1;
+	}
+
+	.zhf-grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.zhf-step {
+		grid-template-columns: minmax(130px, 180px) minmax(0, 1fr) 200px;
+	}
+}
+
+@media (max-width: 782px) {
+	.zhf {
+		margin-inline-start: -10px;
+		padding: 20px 16px 48px;
+	}
+
+	.zhf-kpis {
+		grid-template-columns: minmax(0, 1fr);
+		gap: 12px;
+	}
+
+	.zhf-card {
+		padding: 16px;
+	}
+
+	.zhf-filters {
+		gap: 8px;
+	}
+
+	.zhf-seg {
+		width: 100%;
+		overflow-x: auto;
+	}
+
+	.zhf .zhf-seg-item {
+		flex: 1 0 auto;
+		min-width: 0;
+	}
+
+	.zhf-field-inline,
+	.zhf .zhf-select {
+		flex: 1 1 140px;
+		min-width: 0;
+	}
+
+	.zhf .zhf-filters-end {
+		margin-inline-start: 0;
+	}
+
+	.zhf-step {
+		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-areas:
+			"label nums"
+			"bar bar";
+		gap: 6px 12px;
+		padding: 10px 0;
+	}
+
+	.zhf-step-label {
+		grid-area: label;
+	}
+
+	.zhf-step-bar {
+		grid-area: bar;
+	}
+
+	.zhf-step-nums {
+		grid-area: nums;
+		grid-template-columns: auto 52px 56px;
+	}
+
+	.zhf-row {
+		align-items: flex-start;
+		gap: 16px;
+	}
+}
