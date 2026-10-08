@@ -1,27 +1,23 @@
 <?php
 /**
- * Uninstall: drop the counter table and delete the plugin's options,
- * transients and cron event (every site on multisite).
+ * Uninstall: data is KEPT on purpose.
  *
- * Order meta (_zhf_ctx, _zhf_counted) is left on orders on purpose: it is a
- * few bytes per order and bulk-deleting order meta on a large store is
- * slower and riskier than leaving it.
+ * Deleting the plugin only removes its cron event and report caches. The
+ * counter table and settings stay, so reinstalling picks up where it left
+ * off. To erase the funnel data, use «تنظیمات» → «حذف داده‌ها» in the plugin
+ * (manual, confirmed) before deleting it.
  *
  * @package Zhayon\Funnel
  */
 
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
-/** Remove this plugin's data from the current site. */
+/** Remove only non-data leftovers from the current site. */
 function zhf_uninstall_site() {
 	global $wpdb;
 
-	$table = $wpdb->prefix . 'zhf_funnel_daily';
-	$wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.SchemaChange
-
-	delete_option( 'zhf_settings' );
-	delete_option( 'zhf_db_version' );
 	wp_clear_scheduled_hook( 'zhf_cleanup' );
+	delete_option( 'zhf_cache_gen' );
 
 	// Report caches (5-minute transients).
 	$wpdb->query(

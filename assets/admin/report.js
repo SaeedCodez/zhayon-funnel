@@ -324,6 +324,28 @@
 		window.addEventListener( 'scroll', hideBar, { passive: true } );
 	}
 
+	/* ----------------------------------------------------------- Data purge */
+
+	// The button unlocks only once the confirmation word is typed; the
+	// server checks the same word again (Admin::purge_data()).
+	var purge = root.querySelector( '[data-zhf-purge]' );
+	if ( purge ) {
+		var purgeInput = purge.querySelector( '[data-zhf-purge-input]' );
+		var purgeButton = purge.querySelector( '[data-zhf-purge-button]' );
+		var confirmed = function () {
+			var value = purgeInput.value.trim().toLowerCase();
+			return 'حذف' === value || 'delete' === value;
+		};
+		purgeInput.addEventListener( 'input', function () {
+			purgeButton.disabled = ! confirmed();
+		} );
+		purge.addEventListener( 'submit', function ( e ) {
+			if ( ! confirmed() ) {
+				e.preventDefault();
+			}
+		} );
+	}
+
 	/* ------------------------------------------------------------- Settings */
 
 	var settings = root.querySelector( '[data-zhf-settings]' );

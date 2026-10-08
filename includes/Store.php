@@ -95,6 +95,20 @@ final class Store {
 		return true;
 	}
 
+	/**
+	 * Manual, confirmed wipe of every counter row (admin «حذف داده‌ها»).
+	 * Settings are kept. Returns the number of rows removed, or -1 on failure.
+	 */
+	public static function purge(): int {
+		global $wpdb;
+		$table = self::table();
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery
+		$deleted = $wpdb->query( "DELETE FROM {$table}" );
+		// Invalidate every cached report, with or without a persistent object cache.
+		update_option( 'zhf_cache_gen', (int) get_option( 'zhf_cache_gen', 0 ) + 1, false );
+		return false === $deleted ? -1 : (int) $deleted;
+	}
+
 	/** Daily cron: drop rows older than the retention window. */
 	public static function cleanup(): void {
 		global $wpdb;

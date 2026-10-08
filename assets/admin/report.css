@@ -296,6 +296,23 @@
 	color: var(--zhf-text);
 }
 
+.zhf .zhf-btn-danger {
+	background: var(--zhf-card);
+	border-color: #fecaca;
+	color: var(--zhf-danger);
+}
+
+.zhf .zhf-btn-danger:not(:disabled):hover {
+	background: var(--zhf-danger);
+	border-color: var(--zhf-danger);
+	color: #fff;
+}
+
+.zhf .zhf-btn:disabled {
+	opacity: .5;
+	cursor: not-allowed;
+}
+
 .zhf .zhf-btn:focus-visible {
 	outline: none;
 	box-shadow: 0 0 0 2px var(--zhf-card), 0 0 0 4px var(--zhf-primary);
@@ -1139,6 +1156,21 @@
 .zhf .zhf-col-action {
 	width: 1%;
 	text-align: left;
+}
+
+.zhf-danger {
+	border-color: #fecaca;
+}
+
+.zhf-danger-form {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.zhf-danger-form .zhf-input {
+	width: 140px;
 }
 
 .zhf-actions {

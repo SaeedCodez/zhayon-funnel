@@ -28,6 +28,7 @@ final class Admin {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
 		add_action( 'in_admin_header', array( __CLASS__, 'suppress_notices' ), PHP_INT_MAX );
 		add_action( 'admin_post_zhf_export', array( __CLASS__, 'export_csv' ) );
+		add_action( 'admin_post_zhf_purge', array( __CLASS__, 'purge_data' ) );
 		add_filter( 'option_page_capability_' . Settings::GROUP, array( __CLASS__, 'capability' ) );
 		add_filter( 'plugin_action_links_' . plugin_basename( ZHF_FILE ), array( __CLASS__, 'action_links' ) );
 	}
@@ -161,6 +162,31 @@ final class Admin {
 		$tab = ( isset( $_GET['tab'] ) && 'settings' === $_GET['tab'] ) ? 'settings' : 'report';
 
 		include ZHF_DIR . 'admin/views/page.php';
+	}
+
+	/** Words that confirm a purge (typed by the admin; checked here, not only in JS). */
+	const PURGE_WORDS = array( 'حذف', 'delete' );
+
+	/**
+	 * admin-post.php?action=zhf_purge — delete all funnel data, only when an
+	 * admin asked for it explicitly and typed the confirmation word.
+	 */
+	public static function purge_data(): void {
+		if ( ! current_user_can( self::CAPABILITY ) ) {
+			wp_die( esc_html__( 'دسترسی ندارید.', 'zhayon-funnel' ), 403 );
+		}
+		check_admin_referer( 'zhf_purge' );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
+		$typed = isset( $_POST['zhf_confirm'] ) ? strtolower( trim( sanitize_text_field( wp_unslash( $_POST['zhf_confirm'] ) ) ) ) : '';
+		if ( ! in_array( $typed, self::PURGE_WORDS, true ) ) {
+			wp_safe_redirect( self::url( array( 'tab' => 'settings', 'zhf_purge' => 'unconfirmed' ) ) . '#zhf-danger' );
+			exit;
+		}
+
+		$deleted = Store::purge();
+		wp_safe_redirect( self::url( array( 'tab' => 'settings', 'zhf_purge' => $deleted < 0 ? 'failed' : (string) $deleted ) ) . '#zhf-danger' );
+		exit;
 	}
 
 	/** admin-post.php?action=zhf_export — the filtered daily rows as CSV. */

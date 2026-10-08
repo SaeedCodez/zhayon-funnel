@@ -97,7 +97,11 @@ sanitized to a slug of at most 48 characters.
 2. Activate «Zhayon Funnel». This creates the table and the daily cleanup cron.
 3. Open WooCommerce → «قیف خرید». Data starts with the next cart view.
 
-Deactivating keeps the data; deleting the plugin drops the table and options.
+Deactivating or deleting the plugin keeps the data (table and settings); deleting
+only removes the cron event and report caches. To erase the funnel statistics,
+use «تنظیمات» → «حذف داده‌ها»: an admin types «حذف» (or "delete") to confirm, the
+word is checked again on the server, and every counter row is removed. Settings
+and order meta (`_zhf_ctx`, `_zhf_counted`) are kept.
 
 == Changelog ==
 

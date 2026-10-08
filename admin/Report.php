@@ -135,7 +135,7 @@ final class Report {
 	 * ------------------------------------------------------------------ */
 
 	public static function data( array $f ): array {
-		$key    = 'zhf_r_' . md5( wp_json_encode( array( $f, ZHF_VERSION, Store::DB_VERSION ) ) );
+		$key    = 'zhf_r_' . md5( wp_json_encode( array( $f, ZHF_VERSION, Store::DB_VERSION, (int) get_option( 'zhf_cache_gen', 0 ) ) ) );
 		$cached = get_transient( $key );
 		if ( is_array( $cached ) ) {
 			return $cached;
